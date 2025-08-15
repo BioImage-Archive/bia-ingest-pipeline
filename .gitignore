@@ -1,0 +1,5 @@
+.env
+
+# Text files containing details for stages in the pipeline
+studies-*.txt
+*-ingest-report.txt

@@ -1,0 +1,38 @@
+# bia-ingest-pipeline
+
+This repository contains a pipeline that identifies unprocessed BIA submissions in BioStudies, ingests them, proposes and converts images to OME-Zarr, stages them to Embassy S3, and generates thumbnails and static displays.
+
+---
+
+## Overview
+
+The pipeline performs:
+
+1. **Discovery** - Identify BIA submissions in Biostudies that have not been ingested into the BIA mongoDB.
+2. **Ingestion** - Fetch submission pagetab and persist corresponding BIA model objects into the BIA mongoDB.
+3. **Proposal** - For each ingested study, propose sample (currently 5) images for conversion to OME-Zarr format. If the study has annotation datasets proposes each proposal is a source image and all its related annotation images.
+4. **Manual Modification of Proposals** - Allow manual customisation of proposals e.g. to specify a *pattern* in cases of combining multiple images into a single OME-Zarr archive.
+5. **Image Conversion** - Convert proposed images to OME-Zarr format and upload to Embassy S3.
+6. **Post Conversion Processing** - Create 2D views (thumbnails and static display images), neuroglancer links, etc.
+7. **Logging** - Record processing details for monitoring and audit.
+
+---
+
+## Architecture
+
+```
+[Find Studies] --> [Ingest] --> [Propose Files For Conversion] --> [Assign Files to Images] --> [Conversion] --> [S3 Staging] --> [Logging]
+```
+
+---
+
+## Configuration
+Copy `.env_template` to `.env` and supply required values
+---
+
+## Running the Pipeline
+Once your `.env` is configured, run `00-ingest-pipeline.sh` i.e.
+```
+./00-ingest-pipeline.sh
+```
+---
