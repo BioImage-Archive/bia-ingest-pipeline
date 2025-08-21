@@ -30,10 +30,10 @@ else
     eval $command
     # Add check that command ran successfully
     if [ ! "$?" = "0" ]; then
-        echo "$script_name: Error running $command." | tee --append $ingest_pipeline_log
+        echo "$script_name: Error running $command." | tee -a $ingest_pipeline_log
         return
     elif ! grep -q . $studies_for_ingest_stage; then
-        echo "$script_name: Found 0 studies to ingest." | tee --append $ingest_pipeline_log
+        echo "$script_name: Found 0 studies to ingest." | tee -a $ingest_pipeline_log
         return
     fi
     # Remove exclude list from studies-to-ingest
@@ -57,7 +57,7 @@ else
     # Write message to ingest-pipeline-log
     n_studies_to_ingest=`wc -l < $studies_for_ingest_stage`
     list_of_studies_to_ingest=`tr '\n' ' ' < $studies_for_ingest_stage`
-    echo "$script_name: Found $n_studies_to_ingest studies to ingest: $list_of_studies_to_ingest" | tee --append $ingest_pipeline_log
+    echo "$script_name: Found $n_studies_to_ingest studies to ingest: $list_of_studies_to_ingest" | tee -a $ingest_pipeline_log
 
 fi
 

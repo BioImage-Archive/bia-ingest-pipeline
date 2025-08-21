@@ -84,13 +84,14 @@ do
         echo $command
         eval $command
         # Add check that command ran successfully
-        n_proposals=`grep -P  "^\- accession_id: ${acc_id}" $proposal_output_file | wc -l`
+        #n_proposals=`grep -P  "^\- accession_id: ${acc_id}" $proposal_output_file | wc -l`
+        n_proposals=`grep -E  "^\- accession_id: ${acc_id}" $proposal_output_file | wc -l | tr -d '[:space:]'`
         if [ "$n_proposals" = "0" ]; then
             echo "$script_name: No proposals found -> Try normal way"
             command="poetry --directory $assign_image_dir run bia-assign-image propose-images --api ${api_target} --max-items ${max_items} --no-append ${acc_id} ${proposal_output_file}"
             eval $command
             # Check if proposals were found
-            n_proposals=`grep -P  "^\- accession_id: ${acc_id}" $proposal_output_file | wc -l`
+            n_proposals=`grep -E  "^\- accession_id: ${acc_id}" $proposal_output_file | wc -l tr -d '[:space:]'`
             if [ "$n_proposals" = "0" ]; then
                 echo "$script_name: No proposals found for ${acc_id} -> No further processing"
                 echo "$acc_id" >> ${studies_with_no_proposals}
@@ -113,11 +114,11 @@ done
 n_studies_with_proposals=`wc -l < $studies_for_assign_image_stage`
 list_of_studies_with_proposals=`tr '\n' ' ' < $studies_for_assign_image_stage`
 echo >> $ingest_pipeline_log
-echo "$script_name: Generated proposals for $n_studies_with_proposals studies successfully: $list_of_studies_with_proposals" | tee --append $ingest_pipeline_log
+echo "$script_name: Generated proposals for $n_studies_with_proposals studies successfully: $list_of_studies_with_proposals" | tee -a $ingest_pipeline_log
 
 n_studies_with_no_proposals=`wc -l < $studies_with_no_proposals`
 list_of_studies_with_no_proposals=`tr '\n' ' ' < $studies_with_no_proposals`
 echo >> $ingest_pipeline_log
-echo "$script_name: Could not generate proposals for $n_studies_with_no_proposals studies: $list_of_studies_with_no_proposals" | tee --append $ingest_pipeline_log
+echo "$script_name: Could not generate proposals for $n_studies_with_no_proposals studies: $list_of_studies_with_no_proposals" | tee -a $ingest_pipeline_log
 
 echo && echo "Ending commands for $script_name" && echo ""
