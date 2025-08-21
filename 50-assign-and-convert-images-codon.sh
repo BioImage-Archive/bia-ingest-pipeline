@@ -52,14 +52,17 @@ command="cp $proposals_to_convert_dir/*.yaml $proposals_dir/"
 echo $command
 eval $command
 
-# Use uv as package manager if on slurm. It was used to set up python env
-if [[ $(hostname) == *slurm* ]]; then
-    echo "Running conversion using slurm nodes"
-    source 52_run_assign_and_convert_on_slurm.sh $work_dir $studies_for_assign_image_stage
-else
-    echo "Running conversion in cli"
-    source 51_run_assign_and_convert_local.sh $work_dir $studies_for_assign_image_stage
-fi
+# For the moment treat all platforms as local. On slurm start screen session then log into node in interactive mode ...
+source 51_run_assign_and_convert_local.sh $work_dir $studies_for_assign_image_stage
+
+## Use uv as package manager if on slurm. It was used to set up python env
+#if [[ $(hostname) == *slurm* ]]; then
+#    echo "Running conversion using slurm nodes"
+#    source 52_run_assign_and_convert_on_slurm.sh $work_dir $studies_for_assign_image_stage
+#else
+#    echo "Running conversion in cli"
+#    source 51_run_assign_and_convert_local.sh $work_dir $studies_for_assign_image_stage
+#fi
 
 # Move proposals to attempted conversion directory
 attempted_conversions_dir=$pipeline_dir/attempted_conversions
