@@ -11,7 +11,14 @@ if [ $# -lt 2 ]; then
 fi
 
 work_dir=$1
+
 accession_ids_to_process=$2
+if [ ! -f $accession_ids_to_process ]; then
+    echo "Could not find file with accession ids to process: $accession_ids_to_process. Exiting"
+    return 1
+fi
+
+
 slack_message=$work_dir/assign-and-convert-slack-message.txt
 echo "Subject: Running assign and convert pipeline $date_time_of_run" > $slack_message
 echo "From: $from" >> $slack_message
