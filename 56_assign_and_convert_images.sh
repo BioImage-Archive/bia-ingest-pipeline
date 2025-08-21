@@ -6,6 +6,24 @@
 # Assumes script being run in this dir and vars in ./env are set (see .env_template)
 
 source .env
+
+# If env vars are not exported some commands in bia-converter do
+# not have access.
+export BIA_API_BASEPATH=$BIA_API_BASEPATH
+export BIA_API_USERNAME=$BIA_API_USERNAME
+export BIA_API_PASSWORD=$BIA_API_PASSWORD
+export api_base_url=$BIA_API_BASEPATH
+
+# For storing downloaded files and intermediate conversions
+export cache_root_dirpath=$cache_root_dirpath
+
+# For convert_to_zarr with bioformats2raw
+export bioformats2raw_bin=$bioformats2raw_bin
+export bioformats2raw_java_home=$bioformats2raw_java_home
+
+# For upload to Embassy S3
+export EMBASSY_S3=$EMBASSY_S3
+export bucket_name=$bucket_name
 export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
 export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 
