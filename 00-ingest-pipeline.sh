@@ -59,9 +59,9 @@ source $pipeline_dir/30-propose-images-to-convert.sh $work_dir
 day=$(date -Idate)
 echo >> $ingest_pipeline_log
 echo "Conversion to OME-Zarr scheduled for ${day}T20:00:00." >> $ingest_pipeline_log
-echo "Manually modify/add/remove proposals in $work_dir/proposals before this time." >> $ingest_pipeline_log
+echo "Manually move proposals (modifying if necessary) in $work_dir/proposals to $pipeline_dir/proposals_to_convert before this time." >> $ingest_pipeline_log
 
-# Send message to Slack
+## Send message to Slack
 if [ ! "$dryrun" = "true" ]; then
     source $pipeline_dir/90-send-message-to-slack.sh $ingest_pipeline_log
 fi

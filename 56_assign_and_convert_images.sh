@@ -79,6 +79,11 @@ do
     if [ "$exit_status" = "0" ]; then
         ((n_images_converted++))
         interactive_display_uuid=$(grep -oP 'Created image representation for converted image with uuid: \K[0-9a-fA-F-]+' $convert_to_interactive_display_output)
+        if [ -z $interactive_display_uuid ]; then
+            interactive_display_uuid=$(grep -oP '/\K[0-9a-fA-F-]+\.ome' $convert_to_interactive_display_output | uniq | sed 's/\.ome//')
+        fi
+        #TODO: At this point check to ensure we have interactive image uuid otherwise following commands fail!
+
         # Create static display representation and update example image uri if this is first image converted
         # TODO - check if annotations (i.e. has source_image_uuid in proposals - need two static images in this case)
         if [ "$n_images_converted" -eq 1 ]; then

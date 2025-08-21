@@ -91,7 +91,7 @@ do
             command="poetry --directory $assign_image_dir run bia-assign-image propose-images --api ${api_target} --max-items ${max_items} --no-append ${acc_id} ${proposal_output_file}"
             eval $command
             # Check if proposals were found
-            n_proposals=`grep -E  "^\- accession_id: ${acc_id}" $proposal_output_file | wc -l tr -d '[:space:]'`
+            n_proposals=`grep -E  "^\- accession_id: ${acc_id}" $proposal_output_file | wc -l | tr -d '[:space:]'`
             if [ "$n_proposals" = "0" ]; then
                 echo "$script_name: No proposals found for ${acc_id} -> No further processing"
                 echo "$acc_id" >> ${studies_with_no_proposals}
