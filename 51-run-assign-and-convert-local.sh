@@ -32,7 +32,7 @@ for accession_id in $(cat $accession_ids_to_process)
 do
     echo "processing $accession_id"
     proposal_file=$work_dir/proposals/$accession_id-proposal-output.yaml
-    source 56_assign_and_convert_images.sh $accession_id $work_dir $proposal_file
+    source 56-assign-and-convert-images.sh $accession_id $work_dir $proposal_file
     n_attempted_conversions=$(grep accession_id $proposal_file | wc -l)
     
     log_dir="$work_dir/assign_and_convert/logs/$accession_id/convert_to_interactive_display*"

@@ -6,4 +6,4 @@
 #SBATCH --time=60:00:00
 #SBATCH --mem=32GB
 
-source assign_and_convert_images.sh ACCESSION_ID WORK_DIR WORK_DIR/proposals/ACCESSION_ID-proposal-output.yaml
+source 56-assign-and-convert-images.sh ACCESSION_ID WORK_DIR WORK_DIR/proposals/ACCESSION_ID-proposal-output.yaml

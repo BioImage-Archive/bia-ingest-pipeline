@@ -41,14 +41,16 @@ if [ $# -gt 2 ]; then
     propose_images_output=$3
 fi
 
-# Use uv as package manager on slurm as it was used to set up python env
-if [[ $(hostname) == *slurm* ]]; then
-    echo "Using uv as package manager"
-    pm="uv"
-else
-    echo "Using poetry as package manager"
-    poetry_or_uv="poetry"
-fi
+# TODO: Uncomment below if we decide to use 'uv' on codon. For now using poetry
+poetry_or_uv="poetry"
+## Use uv as package manager on slurm as it was used to set up python env
+#if [[ $(hostname) == *codon* ]]; then
+#    echo "Using uv as package manager"
+#    poetry_or_uv="uv"
+#else
+#    echo "Using poetry as package manager"
+#    poetry_or_uv="poetry"
+#fi
 
 artefact_dir_base=$work_dir/assign_and_convert
 if [ ! -d $artefact_dir_base ]; then

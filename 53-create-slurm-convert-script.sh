@@ -3,9 +3,16 @@ ACCESSION_ID=$1
 WORK_DIR=$2
 JOB_NAME_SUFFIX=$3
 
-submit_convert_fname="$WORK_DIR/slurm_scripts/submit_convert_$ACCESSION_ID.sh"
+slurm_script_dir="$WORK_DIR/slurm_scripts"
 
-command="\cp 54_submit_slurm_convert_script_template.sh $submit_convert_fname"
+if [ ! -d $slurm_script_dir ]; then
+    command="mkdir $slurm_script_dir"
+    echo $command
+    eval $command
+fi
+
+submit_convert_fname="$slurm_script_dir/submit_convert_$ACCESSION_ID.sh"
+command="\cp 54-submit-slurm-convert-script-template.sh $submit_convert_fname"
 echo $command
 eval $command
 
