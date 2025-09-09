@@ -60,7 +60,12 @@ if [ ! -d $ingest_report_dir ]; then
         eval $command
     fi
 fi
-for acc_id in `cat $studies_for_ingest_stage`
+
+# Ingest studies (if N_TO_INGEST set restrict to these)
+# If N_TO_INGEST not set default to 1000 - hopefully all studies
+: "${N_TO_INGEST:=1000}"
+
+for acc_id in `cat $studies_for_ingest_stage | head -n $N_TO_INGEST`
 do
     ingest_report="${ingest_report_dir}/${acc_id}-ingest-report.txt"
     command="poetry --directory $ingest_dir run biaingest ingest -pm ${persistence_mode} --process-filelist always $acc_id 2>&1 | tee $ingest_report"
@@ -84,8 +89,6 @@ do
             echo "$acc_id" >> ${studies_not_ingested_due_to_errors}
         fi
     fi
-    # TODO: Remove this once pipeline is complete.
-    break
 done
 
 # Write message to ingest-pipeline-log.

@@ -40,11 +40,7 @@ fi
 # TODO: For all subscripts below -> pass dryrun as an extra argument. Currently exported
 
 # Create a new ingest log file for message to be emailed to slack
-ingest_pipeline_log=$work_dir/ingest-pipeline.log
-echo "Subject: Running ingest pipeline $ingest_time" > $ingest_pipeline_log
-echo "From: $from" >> $ingest_pipeline_log
-echo "To: $to" >> $ingest_pipeline_log
-echo >> $ingest_pipeline_log
+ingest_pipeline_log="$work_dir/ingest-pipeline.log"
 
 # Find studies to ingest
 source $pipeline_dir/10-find-studies.sh $work_dir 
@@ -63,5 +59,8 @@ echo "Manually move proposals (modifying if necessary) in $work_dir/proposals to
 
 ## Send message to Slack
 if [ ! "$dryrun" = "true" ]; then
-    source $pipeline_dir/90-send-message-to-slack.sh $ingest_pipeline_log
+    subject="Subject: Running ingest pipeline $ingest_time"
+    command="source $pipeline_dir/90-send-message-to-slack.sh '$subject' $to '$ingest_pipeline_log'"
+    echo $command
+    eval $command
 fi

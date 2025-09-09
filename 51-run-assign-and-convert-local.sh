@@ -20,13 +20,6 @@ fi
 
 
 slack_message=$work_dir/assign-and-convert-slack-message.txt
-echo "Subject: Running assign and convert pipeline $date_time_of_run" > $slack_message
-echo "From: $from" >> $slack_message
-echo "To: $to" >> $slack_message
-echo >> $slack_message
-
-
-
 
 for accession_id in $(cat $accession_ids_to_process)
 do
@@ -44,4 +37,7 @@ do
     fi
 done
 
-source $pipeline_dir/90-send-message-to-slack.sh $slack_message
+subject="Subject: Running assign and convert pipeline $date_time_of_run"
+command="source $pipeline_dir/90-send-message-to-slack.sh '$subject' $to '$slack_message'"
+echo $command
+eval $command
