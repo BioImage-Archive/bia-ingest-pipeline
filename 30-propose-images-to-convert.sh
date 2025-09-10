@@ -106,7 +106,6 @@ do
             echo "$acc_id" >> ${studies_for_assign_image_stage}
         fi
     fi
-    break
 done
 
 # Write message to ingest-pipeline-log.
