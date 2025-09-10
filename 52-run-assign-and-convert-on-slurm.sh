@@ -14,10 +14,10 @@ work_dir=$1
 accession_ids_to_process=$2
 slurm_jobname_suffix=$RANDOM
 
-# Submit conversions so that at most n_max_conversion slurm jobs are running. See .env to modify
-# associated env variables
-n_max_conversions=3
-check_interval=300
+# Submit conversions so that at most n_max_conversion slurm jobs are running.
+# See .env to modify associated env variables. Below are defaults if not set.
+: "${n_max_conversions:=3}"
+: "${check_interval:=300}"
 
 for accession_id in $(cat $accession_ids_to_process)
 do

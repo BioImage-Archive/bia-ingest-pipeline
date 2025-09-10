@@ -31,7 +31,7 @@ echo "Using $work_dir as directory for conversion artefacts"
 
 # Create list of studies to process
 studies_for_assign_image_stage="${work_dir}/studies-for-assign-image-stage.txt"
-grep accession_id $proposals_to_convert_dir/*.yaml | cut -d: -f2 | sed 's/ //g' | sort | uniq > $studies_for_assign_image_stage
+grep accession_id $proposals_to_convert_dir/*.yaml | cut -d: -f3 | sed 's/ //g' | sort | uniq > $studies_for_assign_image_stage
 
 if [ ! -f $studies_for_assign_image_stage ]; then
     echo "Did not find expected file for studies to assign images for ($studies_for_assign_image_stage). Exiting."
