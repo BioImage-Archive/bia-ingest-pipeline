@@ -60,7 +60,12 @@ if [ ! -d $ingest_report_dir ]; then
         eval $command
     fi
 fi
-for acc_id in `cat $studies_for_ingest_stage`
+
+# Ingest studies (if N_TO_INGEST set restrict to these)
+# If N_TO_INGEST not set default to 1000 - hopefully all studies
+: "${N_TO_INGEST:=1000}"
+
+for acc_id in `cat $studies_for_ingest_stage | head -n $N_TO_INGEST`
 do
     ingest_report="${ingest_report_dir}/${acc_id}-ingest-report.txt"
     command="poetry --directory $ingest_dir run biaingest ingest -pm ${persistence_mode} --process-filelist always $acc_id 2>&1 | tee $ingest_report"
@@ -72,7 +77,8 @@ do
         eval $command
         # Add check that command ran successfully
         # Can't use exit code because of piping to tee.
-        grep -P "^│ ${acc_id}.*Success.* │\s+│" $ingest_report
+        # grep -P "^│ ${acc_id}.*Success.* │\s+│" $ingest_report 
+        grep -E "^│ ${acc_id}.*Success.* │[[:space:]]+│" $ingest_report
         has_errors=`echo $?`
         # What do we do in case of error?
         if [ "$has_errors" = "0" ]; then
@@ -83,8 +89,6 @@ do
             echo "$acc_id" >> ${studies_not_ingested_due_to_errors}
         fi
     fi
-    # TODO: Remove this once pipeline is complete.
-    break
 done
 
 # Write message to ingest-pipeline-log.
@@ -92,11 +96,11 @@ done
 n_studies_ingested=`wc -l < $studies_for_propose_image_stage`
 list_of_studies_ingested=`tr '\n' ' ' < $studies_for_propose_image_stage`
 echo >> $ingest_pipeline_log
-echo "$script_name: Ingested $n_studies_ingested studies successfully: $list_of_studies_ingested" | tee --append $ingest_pipeline_log
+echo "$script_name: Ingested $n_studies_ingested studies successfully: $list_of_studies_ingested" | tee -a $ingest_pipeline_log
 
 n_studies_not_ingested=`wc -l < $studies_not_ingested_due_to_errors`
 list_of_studies_not_ingested=`tr '\n' ' ' < $studies_not_ingested_due_to_errors`
 echo >> $ingest_pipeline_log
-echo "$script_name: $n_studies_not_ingested studies not ingested: $list_of_studies_not_ingested" | tee --append $ingest_pipeline_log
+echo "$script_name: $n_studies_not_ingested studies not ingested: $list_of_studies_not_ingested" | tee -a $ingest_pipeline_log
 
 echo && echo "Ending commands for $script_name" && echo ""

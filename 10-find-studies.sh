@@ -30,26 +30,32 @@ else
     eval $command
     # Add check that command ran successfully
     if [ ! "$?" = "0" ]; then
-        echo "$script_name: Error running $command." | tee --append $ingest_pipeline_log
+        echo "$script_name: Error running $command." | tee -a $ingest_pipeline_log
         return
     elif ! grep -q . $studies_for_ingest_stage; then
-        echo "$script_name: Found 0 studies to ingest." | tee --append $ingest_pipeline_log
+        echo "$script_name: Found 0 studies to ingest." | tee -a $ingest_pipeline_log
         return
     fi
     # Remove exclude list from studies-to-ingest
     studies_for_ingest_stage_sorted="${studies_for_ingest_stage}_sorted"
-    studies_to_exclude_from_ingest="${pipeline_dir}/studies-to-exclude-from-ingest.txt"
     command="sort $studies_for_ingest_stage > $studies_for_ingest_stage_sorted"
     echo ""
     echo $command
     eval $command
+
+    studies_to_exclude_from_ingest="${pipeline_dir}/studies-to-exclude-from-ingest.txt"
+    studies_to_exclude_from_ingest_sorted="${work_dir}/studies-to-exclude-from-ingest-sorted.txt"
+    command="sort $studies_to_exclude_from_ingest > $studies_to_exclude_from_ingest_sorted"
+    echo ""
+    echo $command
+    eval $command
     
-    command="comm -23 $studies_for_ingest_stage_sorted $studies_to_exclude_from_ingest > $studies_for_ingest_stage"
+    command="comm -23 $studies_for_ingest_stage_sorted $studies_to_exclude_from_ingest_sorted > $studies_for_ingest_stage"
     echo ""
     echo $command
     eval $command
 
-    command="\rm $studies_for_ingest_stage_sorted"
+    command="\rm $studies_for_ingest_stage_sorted && \rm $studies_to_exclude_from_ingest_sorted"
     echo ""
     echo $command
     eval $command
@@ -57,7 +63,7 @@ else
     # Write message to ingest-pipeline-log
     n_studies_to_ingest=`wc -l < $studies_for_ingest_stage`
     list_of_studies_to_ingest=`tr '\n' ' ' < $studies_for_ingest_stage`
-    echo "$script_name: Found $n_studies_to_ingest studies to ingest: $list_of_studies_to_ingest" | tee --append $ingest_pipeline_log
+    echo "$script_name: Found $n_studies_to_ingest studies to ingest: $list_of_studies_to_ingest" | tee -a $ingest_pipeline_log
 
 fi
 

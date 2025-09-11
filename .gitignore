@@ -3,3 +3,5 @@
 # Text files containing details for stages in the pipeline
 studies-*.txt
 *-ingest-report.txt
+attempted_conversions
+proposals_to_convert
