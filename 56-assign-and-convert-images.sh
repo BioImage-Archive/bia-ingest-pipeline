@@ -88,9 +88,18 @@ n_images_converted=0
 # TODO - check if annotations (i.e. has source_image_uuid in proposals - need two static images in this case)
 for uploaded_by_submitter_uuid in $uploaded_by_submitter_uuids
 do
+    # Determine if ome.zarr.zip
+    image_format=$(curl "$BIA_API_BASEPATH/v2/image_representation/$uploaded_by_submitter_uuid" | grep -o '"image_format":"[^"]*"')
+
+    if [[ "$image_format" == '"image_format":".ome.zarr.zip"' ]]; then
+        conversion_function="convert_zipped_ome_zarr_archive"
+    else
+        conversion_function="convert_uploaded_by_submitter_to_interactive_display"
+    fi
+
     # Create interactive display representation
     convert_to_interactive_display_output="$logs_dir_base/convert_to_interactive_display_output_$uploaded_by_submitter_uuid.txt"
-    command='$poetry_or_uv --directory '"$bia_converter_dir"' run bia-converter convert '"$uploaded_by_submitter_uuid"' 2>&1 | tee '"$convert_to_interactive_display_output"'; echo exit_status=${PIPESTATUS[0]}'
+    command='$poetry_or_uv --directory '"$bia_converter_dir"' run bia-converter convert '"$uploaded_by_submitter_uuid"' '"$conversion_function"' 2>&1 | tee '"$convert_to_interactive_display_output"'; echo exit_status=${PIPESTATUS[0]}'
     echo $command;
     eval_output=$(eval "$command")
     echo $eval_output
