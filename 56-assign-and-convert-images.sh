@@ -99,7 +99,7 @@ do
 
     # Create interactive display representation
     convert_to_interactive_display_output="$logs_dir_base/convert_to_interactive_display_output_$uploaded_by_submitter_uuid.txt"
-    command='$poetry_or_uv --directory '"$bia_converter_dir"' run bia-converter convert '"$uploaded_by_submitter_uuid"' '"$conversion_function"' 2>&1 | tee '"$convert_to_interactive_display_output"'; echo exit_status=${PIPESTATUS[0]}'
+    command='$poetry_or_uv --directory '"$bia_converter_dir"' run bia-converter convert --api '"$api_target"' '"$uploaded_by_submitter_uuid"' '"$conversion_function"' 2>&1 | tee '"$convert_to_interactive_display_output"'; echo exit_status=${PIPESTATUS[0]}'
     echo $command;
     eval_output=$(eval "$command")
     echo $eval_output
@@ -117,19 +117,19 @@ do
         # TODO - check if annotations (i.e. has source_image_uuid in proposals - need two static images in this case)
         if [ "$n_images_converted" -eq 1 ]; then
             convert_to_static_display_output="$logs_dir_base/convert_to_static_display_output_$interactive_display_uuid.txt"
-            command="$poetry_or_uv --directory $bia_converter_dir run bia-converter create-static-display  $interactive_display_uuid 2>&1 | tee $convert_to_static_display_output"
+            command="$poetry_or_uv --directory $bia_converter_dir run bia-converter create-static-display  --api $api_target $interactive_display_uuid 2>&1 | tee $convert_to_static_display_output"
             echo $command
             eval $command
 
             image_uuid=$(grep -oP 'COMPLETE.*bia_data_model.Image \K[0-9a-fA-F-]+' $assign_from_proposals_output | head -n 1)
-            command="$poetry_or_uv --directory $bia_converter_dir run python $update_example_image_uri_script_path --update-mode replace $image_uuid"
+            command="$poetry_or_uv --directory $bia_converter_dir run python $update_example_image_uri_script_path --api $api_target --update-mode replace $image_uuid"
             echo $command
             eval $command
         fi
 
         # Create thumbnail representation
         convert_to_thumbnail_output="$logs_dir_base/convert_to_thumbnail_output_$interactive_display_uuid.txt"
-        command="$poetry_or_uv --directory $bia_converter_dir run bia-converter create-thumbnail $interactive_display_uuid 2>&1 | tee $convert_to_thumbnail_output"
+        command="$poetry_or_uv --directory $bia_converter_dir run bia-converter create-thumbnail  --api $api_target $interactive_display_uuid 2>&1 | tee $convert_to_thumbnail_output"
         echo $command
         eval $command
     fi
