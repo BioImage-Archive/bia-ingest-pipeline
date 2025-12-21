@@ -1,3 +1,5 @@
+source bash_funcs.sh
+
 script_name="21-biostudies-to-ro-crate.sh"
 echo "" && echo "Starting commands for $script_name" && echo ""
 
@@ -78,16 +80,21 @@ do
     study_roc_dir="${biostudies_to_roc_dir}/${acc_id}"
     biostudies_to_roc_stdout="${study_roc_dir}/biostudies-to-roc-stdout.txt"
     biostudies_to_roc_stderr="${study_roc_dir}/biostudies-to-roc-stderr.txt"
-    command="poetry --directory $roc_ingest_dir run ro-crate-ingest biostudies-to-roc -c $study_roc_dir $acc_id 2>$biostudies_to_roc_stderr 1>$biostudies_to_roc_stdout
+    command="run $biostudies_to_roc_stdout $biostudies_to_roc_stderr poetry --directory $roc_ingest_dir run ro-crate-ingest biostudies-to-roc -c $study_roc_dir $acc_id"
     if [ "$dryrun" = "true" ]; then
         echo "$script_name: Dry run. Would have run '$command'"
     else
+        if [ ! -d $study_roc_dir ]; then
+            mkdir_command="mkdir $study_roc_dir"
+            echo $mkdir_command
+            eval $mkdir_command
+        fi
         echo $command
         eval $command
         
         # Check that command ran successfully
         # Can't use exit code directly because of piping to tee.
-        exit_code=`echo $PIPESTATUS[0]`
+        exit_code=`echo ${PIPESTATUS[0]}`
         echo "exit code is $exit_code"
         
         # TODO: Check for warnings and errors
@@ -97,18 +104,3 @@ do
         # Check if RO Crate is valid
     fi
 done
-
-# Write message to ingest-pipeline-log.
-# TODO: Separate studies ingested to those with warnings and no warnings.
-n_studies_ingested=`wc -l < $studies_for_propose_image_stage`
-list_of_studies_ingested=`tr '\n' ' ' < $studies_for_propose_image_stage`
-echo >> $ingest_pipeline_log
-echo "$script_name: Ingested $n_studies_ingested studies successfully: $list_of_studies_ingested" | tee -a $ingest_pipeline_log
-
-n_studies_not_ingested=`wc -l < $studies_not_ingested_due_to_errors`
-list_of_studies_not_ingested=`tr '\n' ' ' < $studies_not_ingested_due_to_errors`
-echo >> $ingest_pipeline_log
-echo "$script_name: $n_studies_not_ingested studies not ingested: $list_of_studies_not_ingested" | tee -a $ingest_pipeline_log
-
-echo && echo "Ending commands for $script_name" && echo ""
-
