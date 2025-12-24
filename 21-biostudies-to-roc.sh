@@ -29,7 +29,7 @@ if [ ! -d $biostudies_to_roc_dir ]; then
 fi
 
 source .env
-roc_ingest_dir="${bia_integrator_dir}/ro-crate-ingest"
+roc_ingest_command_dir="${bia_integrator_dir}/ro-crate-ingest"
 studies_for_roc_validation_stage="${biostudies_to_roc_dir}/studies-for-roc-validation-stage.txt"
 studies_for_roc_manual_curation="${biostudies_to_roc_dir}/studies-for-roc-manual-curation.txt"
 studies_not_converted_to_roc_due_to_errors="${biostudies_to_roc_dir}/studies-not-converted-to-roc-due-to-errors.txt"
@@ -79,7 +79,7 @@ do
     study_roc_dir="${biostudies_to_roc_dir}/${acc_id}"
     biostudies_to_roc_stdout="${study_roc_dir}/biostudies-to-roc-stdout.txt"
     biostudies_to_roc_stderr="${study_roc_dir}/biostudies-to-roc-stderr.txt"
-    command="run $biostudies_to_roc_stdout $biostudies_to_roc_stderr poetry --directory $roc_ingest_dir run ro-crate-ingest biostudies-to-roc -c $study_roc_dir $acc_id"
+    command="run $biostudies_to_roc_stdout $biostudies_to_roc_stderr poetry --directory $roc_ingest_command_dir run ro-crate-ingest biostudies-to-roc -c $biostudies_to_roc_dir $acc_id"
     if [ "$dryrun" = "true" ]; then
         echo ""
         echo "$script_name: Dry run. Would have run '$command'"
@@ -101,17 +101,17 @@ do
         # Can't use exit code directly because of piping to tee.
         exit_code=${PIPESTATUS[0]}
         if [ "$exit_code" -eq 0 ]; then
-            # Successful conversion - add to list for next stage
+            # Conversion command ran to completion - still need to check for warnings/errors in stdout
             exit_code_message="$script_name: biostudies-to-roc exited successfully with exit code 0 for study $acc_id"
         else
-            # Failed conversion - log error
+            # Failed conversion
             exit_code_message="$script_name: biostudies-to-roc exited due to error(s) for study $acc_id. Exit code: $exit_code"
         fi
         echo ""
         echo $exit_code_message
         echo ""
         
-        # TODO: Check for warnings and errors
+        # Check for errors in stderr
         n_lines_in_stderr=`wc -l < $biostudies_to_roc_stderr`
         if [ $n_lines_in_stderr -gt 0 ] || [ $exit_code -ne 0 ]; then
             error_log_message="$script_name: Error log ($biostudies_to_roc_stderr) of biostudies-to-roc for $acc_id has content. Last 3 lines: $(tail -n 3 $biostudies_to_roc_stderr)"
@@ -122,6 +122,7 @@ do
         echo $error_log_message
         echo ""
 
+        # Check for errors/warnings in stdout
         errors_warnings_in_output=`grep -i -E "error|warning" $biostudies_to_roc_stdout | tail -n 3`
         if [ ! -z "$errors_warnings_in_output" ]; then
             output_log_message="$script_name: Errors/warnings found in output log ($biostudies_to_roc_stdout) of biostudies-to-roc for $acc_id. Last 3 Errors/Warnings: $errors_warnings_in_output" 
